@@ -96,7 +96,7 @@ const Login = () => {
     
     try {
       // Make API request to login
-      const response = await axios.post(`${baseURL}/auth/login`, {
+      const response = await axios.post(`${baseURL}/api/auth/login`, {
         email: formData.email,
         password: formData.password
       })

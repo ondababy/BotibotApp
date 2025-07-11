@@ -2,9 +2,11 @@ import {Platform} from 'react-native';
 
 let baseURL = '';
 
-{Platform.OS == 'android'
-    ? baseURL = 'http://192.168.127.104:5000/api'
-    : baseURL = 'http://localhost:3000'
+if (Platform.OS == 'android') {
+    baseURL = 'http://192.168.1.57:5000';
+} else {
+    baseURL = 'http://192.168.1.57:5000'; // Use same IP for iOS
 }
 
 export default baseURL;
+export { baseURL as baseUrl }; // Named export for compatibility

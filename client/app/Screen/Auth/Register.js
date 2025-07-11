@@ -169,14 +169,17 @@ export default function Register() {
       setIsLoading(true);
       try {
         // Call the actual API endpoint
-        const response = await axios.post(`${baseURL}/auth/register`, formData);
+        const response = await axios.post(`${baseURL}/api/auth/register`, formData);
 
         // Store user data and token
         await AsyncStorage.setItem("jwt", response.data.token);
         await AsyncStorage.setItem("user", JSON.stringify(response.data.user));
+        
+        console.log("Registration successful, token saved:", response.data.token.substring(0, 20) + "...");
+        console.log("User data:", response.data.user);
 
         Alert.alert("Success", "Account created successfully!", [
-          { text: "OK", onPress: () => router.push("/Screen/Main") },
+          { text: "OK", onPress: () => router.push("/Screen/FaceRegistration") },
         ]);
       } catch (error) {
         let errorMessage = "Failed to create account. Please try again.";

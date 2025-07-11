@@ -4,6 +4,7 @@ from config import config
 from app.utils.db_connection import db_instance
 import os
 from app.routes.auth_routes import auth_bp
+from app.routes.face_routes import face_bp
 
 def create_app(config_name=None):
     """Application factory"""
@@ -18,10 +19,11 @@ def create_app(config_name=None):
         db_instance.connect()
     
     app.register_blueprint(auth_bp)
+    app.register_blueprint(face_bp)
     
     
     return app
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True, host="192.168.127.104", port=5000)
+    app.run(debug=True, host="192.168.1.57", port=5000)
