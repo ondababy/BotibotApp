@@ -4,4 +4,11 @@ pymongo==4.5.0
 python-dotenv==1.0.0
 PyJWT==2.8.0
 Werkzeug==2.3.7
+<<<<<<< HEAD
 email-validator==2.1.0
+=======
+opencv-contrib-python==4.8.0.76
+numpy==1.24.3
+Pillow==10.0.0
+requests==2.31.0
+>>>>>>> 5d9ce8a6db9b8eeb294dfba5876fef581260c24e

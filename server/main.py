@@ -4,7 +4,11 @@ from config import config
 from app.utils.db_connection import db_instance
 import os
 from app.routes.auth_routes import auth_bp
+<<<<<<< HEAD
 from app.routes.schedule_routes import schedule_bp
+=======
+from app.routes.face_routes import face_bp
+>>>>>>> 5d9ce8a6db9b8eeb294dfba5876fef581260c24e
 
 def create_app(config_name=None):
     """Application factory"""
@@ -19,10 +23,19 @@ def create_app(config_name=None):
         db_instance.connect()
     
     app.register_blueprint(auth_bp)
+<<<<<<< HEAD
     app.register_blueprint(schedule_bp)
+=======
+    app.register_blueprint(face_bp)
+    
+>>>>>>> 5d9ce8a6db9b8eeb294dfba5876fef581260c24e
     
     return app
 
 if __name__ == '__main__':
     app = create_app()
+<<<<<<< HEAD
     app.run(debug=True, host="192.168.1.42", port=5000)
+=======
+    app.run(debug=True, host="192.168.1.57", port=5000)
+>>>>>>> 5d9ce8a6db9b8eeb294dfba5876fef581260c24e
