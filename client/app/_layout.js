@@ -61,6 +61,36 @@ const RootLayout = () => {
             headerShown: false 
           }} 
         />
+        <Stack.Screen 
+          name="Screen/Dashboard" 
+          options={{ 
+            headerShown: false 
+          }} 
+        />
+        <Stack.Screen 
+          name="Screen/AddSchedule" 
+          options={{ 
+            headerShown: false 
+          }} 
+        />
+        <Stack.Screen 
+          name="Screen/ScheduleList" 
+          options={{ 
+            headerShown: false 
+          }} 
+        />
+        <Stack.Screen 
+          name="Screen/Auth/Login" 
+          options={{ 
+            headerShown: false 
+          }} 
+        />
+        <Stack.Screen 
+          name="Screen/Auth/Register" 
+          options={{ 
+            headerShown: false 
+          }} 
+        />
       </Stack>
     </AuthProvider>
   );

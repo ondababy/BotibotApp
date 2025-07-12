@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
-import baseURL from '../../assets/common/baseUrl'
+import { baseURL } from '../../assets/common/baseUrl'
 import { Alert } from 'react-native'
 
 const AuthContext = createContext()
@@ -21,7 +21,9 @@ export const AuthProvider = ({ children }) => {
         
         if (token) {
           setUserToken(token)
-          setUserInfo(JSON.parse(userData))
+          if (userData) {
+            setUserInfo(JSON.parse(userData))
+          }
           setIsAuthenticated(true)
         }
       } catch (error) {
@@ -38,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setIsLoading(true)
     try {
-      const response = await axios.post(`${baseURL}/users/login`, {
+      const response = await axios.post(`${baseURL}/auth/login`, {
         email,
         password
       })
@@ -75,7 +77,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     setIsLoading(true)
     try {
-      const response = await axios.post(`${baseURL}/users/register`, userData)
+      const response = await axios.post(`${baseURL}/auth/register`, userData)
       
       const { token, user } = response.data
       

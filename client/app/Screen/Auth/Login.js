@@ -20,7 +20,7 @@ import * as Animatable from 'react-native-animatable'
 import { LinearGradient } from 'expo-linear-gradient'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
-import baseURL from '../../../assets/common/baseUrl'
+import { baseURL } from '../../../assets/common/baseUrl'
 
 const { width, height } = Dimensions.get('window')
 
@@ -116,7 +116,7 @@ const Login = () => {
       }
       
       // Navigate to main screen
-      router.push('/Screen/Main')
+      router.push('/Screen/ScheduleList')
     } catch (error) {
       let errorMessage = 'Login failed. Please try again.'
       

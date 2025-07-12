@@ -79,6 +79,10 @@ export default function Index() {
     router.push('/Screen/Auth/Login');
   };
 
+  //   const handleLogin = () => {
+  //   router.push('/Screen/Dashboard');
+  // };
+
   const handleRegister = () => {
     router.push('/Screen/Auth/Register');
   };

@@ -1,18 +1,18 @@
 from flask import request, jsonify
 import jwt
-import datetime
+from datetime import datetime, timezone, timedelta
 from app.models.user_model import User
 from app.utils.validations import validate_login_data, validate_registration_data
 from functools import wraps
 import os
 
-SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'default_secret_key')
+SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'botibot_secret_key_2025')
 
 def generate_token(user_id):
     """Generate a JWT token for the user"""
     payload = {
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1),
-        'iat': datetime.datetime.utcnow(),
+        'exp': datetime.now(timezone.utc) + timedelta(days=1),
+        'iat': datetime.now(timezone.utc),
         'sub': str(user_id)
     }
     return jwt.encode(payload, SECRET_KEY, algorithm='HS256')

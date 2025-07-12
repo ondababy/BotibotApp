@@ -31,7 +31,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
 import * as Progress from "react-native-progress";
 import axios from "axios";
-import baseURL from "../../../assets/common/baseUrl";
+import { baseURL } from "../../../assets/common/baseUrl";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
@@ -176,7 +176,7 @@ export default function Register() {
         await AsyncStorage.setItem("user", JSON.stringify(response.data.user));
 
         Alert.alert("Success", "Account created successfully!", [
-          { text: "OK", onPress: () => router.push("/Screen/Main") },
+          { text: "OK", onPress: () => router.push("/Screen/ScheduleList") },
         ]);
       } catch (error) {
         let errorMessage = "Failed to create account. Please try again.";

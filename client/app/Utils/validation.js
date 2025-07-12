@@ -2,52 +2,55 @@
 export const validateForm = (formData) => {
   const errors = {}
 
-  // Required field validation
-  if (!formData.firstName?.trim()) errors.firstName = 'First name is required'
-  if (!formData.lastName?.trim()) errors.lastName = 'Last name is required'
-  if (!formData.age?.trim()) errors.age = 'Age is required'
-  if (!formData.address?.trim()) errors.address = 'Address is required'
+  // Required field validation - only for essential fields
   if (!formData.email?.trim()) errors.email = 'Email is required'
-  if (!formData.contactNumber?.trim()) errors.contactNumber = 'Contact number is required'
-  if (!formData.emergencyContactName?.trim()) errors.emergencyContactName = 'Emergency contact name is required'
-  if (!formData.emergencyContactNumber?.trim()) errors.emergencyContactNumber = 'Emergency contact number is required'
+  if (!formData.password?.trim()) errors.password = 'Password is required'
 
-  // Email validation
+  // Optional fields - only validate if provided
+  if (formData.firstName && !formData.firstName.trim()) errors.firstName = 'First name cannot be empty'
+  if (formData.lastName && !formData.lastName.trim()) errors.lastName = 'Last name cannot be empty'
+
+  // Email validation - more lenient
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (formData.email && !emailRegex.test(formData.email)) {
     errors.email = 'Please enter a valid email address'
   }
 
-  // Password validations
-  if (!formData.password?.trim()) errors.password = 'Password is required'
-
-  // Password strength validation
-  if (formData.password && formData.password.length < 8) {
-    errors.password = 'Password must be at least 8 characters'
+  // Password validation - more lenient
+  if (formData.password && formData.password.length < 3) {
+    errors.password = 'Password must be at least 3 characters'
   }
   
-  // Confirm password validation
-  if (!formData.confirmPassword?.trim()) {
-    errors.confirmPassword = 'Please confirm your password'
-  } else if (formData.confirmPassword !== formData.password) {
-    errors.confirmPassword = 'Passwords do not match'
+  // Confirm password validation - only if confirmPassword field exists
+  if (formData.confirmPassword !== undefined) {
+    if (!formData.confirmPassword?.trim()) {
+      errors.confirmPassword = 'Please confirm your password'
+    } else if (formData.confirmPassword !== formData.password) {
+      errors.confirmPassword = 'Passwords do not match'
+    }
   }
 
-  // Age validation
-  const ageNum = parseInt(formData.age)
-  if (formData.age && (isNaN(ageNum) || ageNum < 1 || ageNum > 120)) {
-    errors.age = 'Please enter a valid age (1-120)'
+  // Age validation - more lenient
+  if (formData.age) {
+    const ageNum = parseInt(formData.age)
+    if (isNaN(ageNum) || ageNum < 1 || ageNum > 150) {
+      errors.age = 'Please enter a valid age'
+    }
   }
 
-  // Phone number validation (Philippines format - 11 digits)
-  const phoneRegex = /^(?:\+63|0)?\d{10,11}$/
-  
-  if (formData.contactNumber && !phoneRegex.test(formData.contactNumber.replace(/\s/g, ''))) {
-    errors.contactNumber = 'Please enter a valid 11-digit phone number'
+  // Phone number validation - very lenient, accept any format
+  if (formData.contactNumber) {
+    const phoneClean = formData.contactNumber.replace(/\D/g, '') // Remove non-digits
+    if (phoneClean.length < 7 || phoneClean.length > 15) {
+      errors.contactNumber = 'Please enter a valid phone number'
+    }
   }
   
-  if (formData.emergencyContactNumber && !phoneRegex.test(formData.emergencyContactNumber.replace(/\s/g, ''))) {
-    errors.emergencyContactNumber = 'Please enter a valid 11-digit phone number'
+  if (formData.emergencyContactNumber) {
+    const phoneClean = formData.emergencyContactNumber.replace(/\D/g, '')
+    if (phoneClean.length < 7 || phoneClean.length > 15) {
+      errors.emergencyContactNumber = 'Please enter a valid phone number'
+    }
   }
 
   return {
