@@ -4,7 +4,7 @@ import { baseURL } from '../../assets/common/baseUrl';
 
 // Create axios instance with base configuration
 const scheduleApi = axios.create({
-  baseURL: baseURL,
+  baseURL: `${baseURL}/api`,
   timeout: 10000,
 });
 
