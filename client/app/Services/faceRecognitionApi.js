@@ -1,10 +1,10 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { baseUrl } from '../../assets/common/baseUrl';
+import { baseURL } from '../../assets/common/baseUrl';
 
 // Create an axios instance for face recognition API
 const faceAPI = axios.create({
-  baseURL: `${baseUrl}/api/face`,
+  baseURL: `${baseURL}/face`,
   timeout: 30000, // 30 seconds timeout for image uploads
   headers: {
     'Content-Type': 'application/json',

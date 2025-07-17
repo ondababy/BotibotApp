@@ -169,7 +169,7 @@ export default function Register() {
       setIsLoading(true);
       try {
         // Call the actual API endpoint
-        const response = await axios.post(`${baseURL}/api/auth/register`, formData);
+        const response = await axios.post(`${baseURL}/auth/register`, formData);
 
         // Store user data and token
         await AsyncStorage.setItem("jwt", response.data.token);
@@ -178,9 +178,21 @@ export default function Register() {
         console.log("Registration successful, token saved:", response.data.token.substring(0, 20) + "...");
         console.log("User data:", response.data.user);
 
-        Alert.alert("Success", "Account created successfully!", [
-          { text: "OK", onPress: () => router.push("/Screen/ScheduleList") },
-        ]);
+        Alert.alert(
+          "Success", 
+          "Account created successfully! Let's set up face recognition for enhanced security.", 
+          [
+            {
+              text: "Set Up Face ID",
+              onPress: () => router.push("/Screen/FaceRegistration"),
+            },
+            {
+              text: "Skip for Now",
+              style: "cancel",
+              onPress: () => router.push("/Screen/ScheduleList"),
+            },
+          ]
+        );
       } catch (error) {
         let errorMessage = "Failed to create account. Please try again.";
 

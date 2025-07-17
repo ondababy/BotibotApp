@@ -172,12 +172,12 @@ export default function FaceRegistration() {
 
       if (response.success) {
         Alert.alert(
-          'Success!',
-          'Face registration completed successfully. You can now use face recognition for login.',
+          'Face Registration Complete!',
+          `Successfully registered ${response.samples_saved} face samples. Your face ID is now linked to your account for secure authentication.`,
           [
             {
-              text: 'Continue',
-              onPress: () => router.replace('/Screen/Main'),
+              text: 'Continue to App',
+              onPress: () => router.replace('/Screen/ScheduleList'),
             },
           ]
         );
@@ -205,7 +205,7 @@ export default function FaceRegistration() {
           { 
             text: 'Skip for Now', 
             style: 'cancel',
-            onPress: () => router.replace('/Screen/Main')
+            onPress: () => router.replace('/Screen/ScheduleList')
           },
         ]
       );
@@ -217,13 +217,13 @@ export default function FaceRegistration() {
   const skipFaceRegistration = () => {
     Alert.alert(
       'Skip Face Registration?',
-      'You can register your face later in the app settings.',
+      'You can register your face later in the app settings for enhanced security.',
       [
         { text: 'Cancel', style: 'cancel' },
         { 
           text: 'Skip', 
           style: 'default',
-          onPress: () => router.replace('/Screen/Main')
+          onPress: () => router.replace('/Screen/ScheduleList')
         },
       ]
     );
