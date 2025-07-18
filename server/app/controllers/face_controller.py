@@ -25,7 +25,7 @@ def get_current_user():
         return None
     
     try:
-        secret_key = os.getenv('JWT_SECRET_KEY', 'default_secret_key')
+        secret_key = os.getenv('JWT_SECRET_KEY', 'botibot_secret_key_2025')
         data = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = data['sub']  # Use 'sub' to match auth controller
         print(f"Decoded user_id: {user_id}")  # Debug log
@@ -71,12 +71,20 @@ def register_face():
         # Register face samples
         result = face_service.register_face_samples(str(user['_id']), images)
         
+        # Update user record with face data
+        User.update_face_data(
+            user['_id'], 
+            result['face_id'], 
+            result['samples_saved']
+        )
+        
         return jsonify({
             'message': f'Face registration completed successfully. {result["samples_saved"]} samples saved and model trained.',
             'success': True,
             'face_id': result['face_id'],
             'samples_saved': result['samples_saved'],
-            'results': result['results']
+            'results': result['results'],
+            'user_id': str(user['_id'])
         }), 200
         
     except ValueError as e:
@@ -149,7 +157,8 @@ def get_face_status():
         return jsonify({
             'face_registered': has_face,
             'user_id': str(user['_id']),
-            'face_id': user.get('face_id')
+            'face_id': user.get('face_id'),
+            'samples_count': user.get('face_samples_count', 0)
         }), 200
         
     except Exception as e:
@@ -169,6 +178,13 @@ def delete_face_data():
         
         # Delete user's face data
         face_service.delete_user_face_data(str(user['_id']))
+        
+        # Update user record
+        User.update_user(user['_id'], {
+            'face_id': None,
+            'face_registered': False,
+            'face_samples_count': 0
+        })
         
         return jsonify({
             'message': 'User face data deleted successfully',

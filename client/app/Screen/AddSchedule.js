@@ -1,17 +1,44 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  Alert, ActivityIndicator, Switch, Dimensions
+  Alert, ActivityIndicator, Switch, Dimensions, StatusBar, Platform, TextInput
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { scheduleService } from '../Services/scheduleApi';
-import { InputField } from '../Components/InputField';
 import { moderateScale, verticalScale } from '../Utils/metrics';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Animatable from 'react-native-animatable';
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth, width } = Dimensions.get('window');
+
+// Custom InputField component with proper styling
+const InputField = ({ label, value, onChangeText, placeholder, error, multiline = false, numberOfLines = 1, icon, style }) => {
+  return (
+    <View style={styles.inputContainer}>
+      <Text style={styles.inputLabel}>{label}</Text>
+      <View style={[styles.inputWrapper, error && styles.inputError, style]}>
+        {icon && <View style={styles.inputIcon}>{icon}</View>}
+        <TextInput
+          style={[
+            styles.textInput,
+            multiline && styles.textInputMultiline,
+            icon && styles.textInputWithIcon
+          ]}
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor="#999"
+          multiline={multiline}
+          numberOfLines={numberOfLines}
+          textAlignVertical={multiline ? 'top' : 'center'}
+        />
+      </View>
+      {error && <Text style={styles.errorText}>{error}</Text>}
+    </View>
+  );
+};
 
 export default function AddSchedule() {
   const router = useRouter();
@@ -203,69 +230,122 @@ export default function AddSchedule() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#4a6fa5" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Add Medication</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <StatusBar barStyle="light-content" backgroundColor="#4a6fa5" />
+      
+      {/* Enhanced Header */}
+      <LinearGradient
+        colors={['#4a6fa5', '#38598b']}
+        style={styles.header}
+      >
+        <View style={styles.headerContent}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          
+          <View style={styles.headerTitleContainer}>
+            <Text style={styles.headerTitle}>Add Medication</Text>
+            <Text style={styles.headerSubtitle}>Create a new schedule</Text>
+          </View>
+          
+          <View style={styles.headerIcon}>
+            <Ionicons name="medical" size={24} color="rgba(255,255,255,0.8)" />
+          </View>
+        </View>
+      </LinearGradient>
       
       <ScrollView 
         style={styles.content} 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
+        {/* Progress Indicator */}
+        <Animatable.View 
+          animation="fadeInDown" 
+          delay={200}
+          style={styles.progressCard}
+        >
+          <View style={styles.progressHeader}>
+            <Ionicons name="checkbox-outline" size={20} color="#4a6fa5" />
+            <Text style={styles.progressTitle}>Medication Setup</Text>
+          </View>
+          <View style={styles.progressBar}>
+            <View style={[styles.progressFill, { width: '25%' }]} />
+          </View>
+        </Animatable.View>
+
         {/* Medication Details Section */}
-        <View style={styles.section}>
+        <Animatable.View 
+          animation="fadeInUp" 
+          delay={300}
+          style={styles.section}
+        >
           <View style={styles.sectionHeader}>
-            <Ionicons name="medical" size={20} color="#4a6fa5" />
-            <Text style={styles.sectionTitle}>Medication Details</Text>
+            <LinearGradient
+              colors={['#4a6fa5', '#38598b']}
+              style={styles.sectionIconContainer}
+            >
+              <Ionicons name="medical" size={18} color="#fff" />
+            </LinearGradient>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitle}>Medication Details</Text>
+              <Text style={styles.sectionSubtitle}>Enter medication information</Text>
+            </View>
           </View>
           
-          <InputField
-            label="Medication Name *"
-            value={schedule.medication_name}
-            onChangeText={(value) => handleInputChange('medication_name', value)}
-            placeholder="Enter medication name"
-            error={errors.medication_name}
-            style={styles.input}
-            icon={<Ionicons name="medkit-outline" size={16} color="#4a6fa5" />}
-          />
-          
-          <InputField
-            label="Dosage *"
-            value={schedule.dosage}
-            onChangeText={(value) => handleInputChange('dosage', value)}
-            placeholder="e.g., 1 tablet, 10mg"
-            error={errors.dosage}
-            style={styles.input}
-            icon={<Ionicons name="medical-outline" size={16} color="#4a6fa5" />}
-          />
-          
-          <InputField
-            label="Notes (Optional)"
-            value={schedule.notes}
-            onChangeText={(value) => handleInputChange('notes', value)}
-            placeholder="Additional instructions"
-            multiline
-            numberOfLines={2}
-            style={styles.notesInput}
-            icon={<Ionicons name="document-text-outline" size={16} color="#4a6fa5" />}
-          />
-        </View>
+          <View style={styles.inputsContainer}>
+            <InputField
+              label="Medication Name *"
+              value={schedule.medication_name}
+              onChangeText={(value) => handleInputChange('medication_name', value)}
+              placeholder="Enter medication name"
+              error={errors.medication_name}
+              icon={<Ionicons name="medkit-outline" size={16} color="#4a6fa5" />}
+            />
+            
+            <InputField
+              label="Dosage *"
+              value={schedule.dosage}
+              onChangeText={(value) => handleInputChange('dosage', value)}
+              placeholder="e.g., 1 tablet, 10mg"
+              error={errors.dosage}
+              icon={<Ionicons name="medical-outline" size={16} color="#4a6fa5" />}
+            />
+            
+            <InputField
+              label="Notes (Optional)"
+              value={schedule.notes}
+              onChangeText={(value) => handleInputChange('notes', value)}
+              placeholder="Additional instructions"
+              multiline
+              numberOfLines={3}
+              icon={<Ionicons name="document-text-outline" size={16} color="#4a6fa5" />}
+            />
+          </View>
+        </Animatable.View>
         
-        {/* Schedule Section */}
-        <View style={styles.section}>
+        {/* Schedule Configuration Section */}
+        <Animatable.View 
+          animation="fadeInUp" 
+          delay={400}
+          style={styles.section}
+        >
           <View style={styles.sectionHeader}>
-            <Ionicons name="calendar" size={20} color="#4a6fa5" />
-            <Text style={styles.sectionTitle}>Schedule</Text>
+            <LinearGradient
+              colors={['#4a6fa5', '#38598b']}
+              style={styles.sectionIconContainer}
+            >
+              <Ionicons name="calendar" size={18} color="#fff" />
+            </LinearGradient>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitle}>Schedule Configuration</Text>
+              <Text style={styles.sectionSubtitle}>Set up timing and frequency</Text>
+            </View>
           </View>
           
-          {/* Frequency Selection */}
+          {/* Enhanced Frequency Selection */}
           <View style={styles.frequencyContainer}>
             <Text style={styles.label}>Frequency</Text>
             <View style={styles.frequencyOptions}>
@@ -276,12 +356,22 @@ export default function AddSchedule() {
                 ]}
                 onPress={() => handleFrequencyChange('daily')}
               >
-                <Text style={[
-                  styles.frequencyText,
-                  schedule.frequency === 'daily' && styles.frequencyTextActive
-                ]}>
-                  Daily
-                </Text>
+                <LinearGradient
+                  colors={schedule.frequency === 'daily' ? ['#4a6fa5', '#38598b'] : ['#f8f9fa', '#f8f9fa']}
+                  style={styles.frequencyGradient}
+                >
+                  <Ionicons 
+                    name="infinite" 
+                    size={16} 
+                    color={schedule.frequency === 'daily' ? '#fff' : '#6c757d'} 
+                  />
+                  <Text style={[
+                    styles.frequencyText,
+                    schedule.frequency === 'daily' && styles.frequencyTextActive
+                  ]}>
+                    Daily
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
               
               <TouchableOpacity
@@ -291,19 +381,29 @@ export default function AddSchedule() {
                 ]}
                 onPress={() => handleFrequencyChange('specific_days')}
               >
-                <Text style={[
-                  styles.frequencyText,
-                  schedule.frequency === 'specific_days' && styles.frequencyTextActive
-                ]}>
-                  Specific Days
-                </Text>
+                <LinearGradient
+                  colors={schedule.frequency === 'specific_days' ? ['#4a6fa5', '#38598b'] : ['#f8f9fa', '#f8f9fa']}
+                  style={styles.frequencyGradient}
+                >
+                  <Ionicons 
+                    name="calendar-outline" 
+                    size={16} 
+                    color={schedule.frequency === 'specific_days' ? '#fff' : '#6c757d'} 
+                  />
+                  <Text style={[
+                    styles.frequencyText,
+                    schedule.frequency === 'specific_days' && styles.frequencyTextActive
+                  ]}>
+                    Specific Days
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           </View>
           
-          {/* Days Selection */}
+          {/* Enhanced Days Selection */}
           {schedule.frequency === 'specific_days' && (
-            <View style={styles.daysContainer}>
+            <Animatable.View animation="slideInRight" style={styles.daysContainer}>
               <Text style={styles.label}>Select Days</Text>
               <View style={styles.daysGrid}>
                 {weekdays.map(day => (
@@ -315,22 +415,27 @@ export default function AddSchedule() {
                     ]}
                     onPress={() => toggleDay(day.id)}
                   >
-                    <Text style={[
-                      styles.dayText,
-                      schedule.days_of_week.includes(day.id) && styles.dayTextActive
-                    ]}>
-                      {day.name}
-                    </Text>
+                    <LinearGradient
+                      colors={schedule.days_of_week.includes(day.id) ? ['#4a6fa5', '#38598b'] : ['#f8f9fa', '#f8f9fa']}
+                      style={styles.dayGradient}
+                    >
+                      <Text style={[
+                        styles.dayText,
+                        schedule.days_of_week.includes(day.id) && styles.dayTextActive
+                      ]}>
+                        {day.name}
+                      </Text>
+                    </LinearGradient>
                   </TouchableOpacity>
                 ))}
               </View>
               {errors.days_of_week && (
                 <Text style={styles.errorText}>{errors.days_of_week}</Text>
               )}
-            </View>
+            </Animatable.View>
           )}
           
-          {/* Duration */}
+          {/* Enhanced Duration */}
           <View style={styles.durationContainer}>
             <Text style={styles.label}>Duration</Text>
             <View style={styles.dateRow}>
@@ -338,22 +443,44 @@ export default function AddSchedule() {
                 style={styles.dateButton}
                 onPress={() => setShowStartDatePicker(true)}
               >
-                <Ionicons name="calendar-outline" size={16} color="#4a6fa5" />
-                <Text style={styles.dateText}>
-                  {schedule.start_date.toLocaleDateString()}
-                </Text>
+                <View style={styles.dateContent}>
+                  <Ionicons name="calendar-outline" size={18} color="#4a6fa5" />
+                  <View style={styles.dateTextContainer}>
+                    <Text style={styles.dateLabel}>Start Date</Text>
+                    <Text style={styles.dateText}>
+                      {schedule.start_date.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </Text>
+                  </View>
+                </View>
               </TouchableOpacity>
               
-              <Text style={styles.toText}>to</Text>
+              <View style={styles.arrowContainer}>
+                <Ionicons name="arrow-forward" size={16} color="#4a6fa5" />
+              </View>
               
               <TouchableOpacity 
                 style={styles.dateButton}
                 onPress={() => setShowEndDatePicker(true)}
               >
-                <Ionicons name="calendar-outline" size={16} color="#4a6fa5" />
-                <Text style={styles.dateText}>
-                  {schedule.end_date ? schedule.end_date.toLocaleDateString() : 'Ongoing'}
-                </Text>
+                <View style={styles.dateContent}>
+                  <Ionicons name="calendar-outline" size={18} color="#4a6fa5" />
+                  <View style={styles.dateTextContainer}>
+                    <Text style={styles.dateLabel}>End Date</Text>
+                    <Text style={styles.dateText}>
+                      {schedule.end_date ? 
+                        schedule.end_date.toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        }) : 'Ongoing'
+                      }
+                    </Text>
+                  </View>
+                </View>
               </TouchableOpacity>
             </View>
             {errors.end_date && (
@@ -361,7 +488,7 @@ export default function AddSchedule() {
             )}
           </View>
           
-          {/* Times */}
+          {/* Enhanced Times */}
           <View style={styles.timeContainer}>
             <View style={styles.timesHeader}>
               <Text style={styles.label}>Reminder Times</Text>
@@ -369,13 +496,24 @@ export default function AddSchedule() {
                 style={styles.addTimeButton}
                 onPress={addTimeSlot}
               >
-                <Ionicons name="add-circle" size={20} color="#4a6fa5" />
+                <LinearGradient
+                  colors={['#4a6fa5', '#38598b']}
+                  style={styles.addTimeGradient}
+                >
+                  <Ionicons name="add" size={16} color="#fff" />
+                  <Text style={styles.addTimeText}>Add Time</Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
             
             <View style={styles.timesGrid}>
               {schedule.times.map((time, index) => (
-                <View key={index} style={styles.timeRow}>
+                <Animatable.View 
+                  key={index} 
+                  animation="bounceIn" 
+                  delay={index * 100}
+                  style={styles.timeRow}
+                >
                   <TouchableOpacity 
                     style={styles.timeButton}
                     onPress={() => {
@@ -383,8 +521,19 @@ export default function AddSchedule() {
                       setShowTimePicker(true);
                     }}
                   >
-                    <Ionicons name="time-outline" size={16} color="#4a6fa5" />
-                    <Text style={styles.timeText}>{time}</Text>
+                    <View style={styles.timeContent}>
+                      <Ionicons name="time-outline" size={18} color="#4a6fa5" />
+                      <Text style={styles.timeText}>{time}</Text>
+                      <Text style={styles.timeFormat}>
+                        {(() => {
+                          const [hours, minutes] = time.split(':');
+                          const hour = parseInt(hours, 10);
+                          const period = hour >= 12 ? 'PM' : 'AM';
+                          const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+                          return `${displayHour}:${minutes} ${period}`;
+                        })()}
+                      </Text>
+                    </View>
                   </TouchableOpacity>
                   
                   {schedule.times.length > 1 && (
@@ -392,10 +541,10 @@ export default function AddSchedule() {
                       style={styles.removeTimeButton}
                       onPress={() => removeTimeSlot(index)}
                     >
-                      <Ionicons name="close-circle" size={18} color="#e74c3c" />
+                      <Ionicons name="close-circle" size={20} color="#e74c3c" />
                     </TouchableOpacity>
                   )}
-                </View>
+                </Animatable.View>
               ))}
             </View>
             {errors.times && (
@@ -403,43 +552,65 @@ export default function AddSchedule() {
             )}
           </View>
           
-          {/* Reminder Toggle */}
-          <View style={styles.reminderToggle}>
-            <View style={styles.reminderLabel}>
-              <Ionicons name="notifications-outline" size={18} color="#4a6fa5" />
-              <Text style={styles.label}>Enable Reminders</Text>
+          {/* Enhanced Reminder Toggle */}
+          <View style={styles.reminderContainer}>
+            <View style={styles.reminderContent}>
+              <View style={styles.reminderIconContainer}>
+                <Ionicons 
+                  name={schedule.reminder_enabled ? "notifications" : "notifications-off"} 
+                  size={18} 
+                  color="#4a6fa5" 
+                />
+              </View>
+              <View style={styles.reminderTextContainer}>
+                <Text style={styles.reminderTitle}>Push Notifications</Text>
+                <Text style={styles.reminderDescription}>
+                  Get reminded when it's time to take your medication
+                </Text>
+              </View>
             </View>
             <Switch
               value={schedule.reminder_enabled}
               onValueChange={(value) => handleInputChange('reminder_enabled', value)}
               trackColor={{ false: '#e0e0e0', true: '#a8c0d6' }}
               thumbColor={schedule.reminder_enabled ? '#4a6fa5' : '#f4f3f4'}
+              ios_backgroundColor="#e0e0e0"
             />
           </View>
-        </View>
+        </Animatable.View>
         
-        {/* Submit Button */}
-        <TouchableOpacity
-          style={styles.submitButton}
-          onPress={handleSubmit}
-          disabled={isLoading}
+        {/* Enhanced Submit Button */}
+        <Animatable.View 
+          animation="fadeInUp" 
+          delay={500}
+          style={styles.submitContainer}
         >
-          <LinearGradient
-            colors={['#4a6fa5', '#38598b']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.submitGradient}
+          <TouchableOpacity
+            style={[styles.submitButton, isLoading && styles.submitButtonDisabled]}
+            onPress={handleSubmit}
+            disabled={isLoading}
+            activeOpacity={0.8}
           >
-            {isLoading ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <>
-                <Ionicons name="save-outline" size={18} color="#fff" />
-                <Text style={styles.submitText}>Save Medication</Text>
-              </>
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
+            <LinearGradient
+              colors={isLoading ? ['#a8c0d6', '#a8c0d6'] : ['#4a6fa5', '#38598b']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.submitGradient}
+            >
+              {isLoading ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="small" color="#fff" />
+                  <Text style={styles.submitText}>Creating Schedule...</Text>
+                </View>
+              ) : (
+                <View style={styles.submitContent}>
+                  <Ionicons name="save-outline" size={20} color="#fff" />
+                  <Text style={styles.submitText}>Save Medication Schedule</Text>
+                </View>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+        </Animatable.View>
       </ScrollView>
       
       {/* Date/Time Pickers */}
@@ -484,239 +655,453 @@ export default function AddSchedule() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f5f1e8',
   },
+  
+  // Enhanced Header Styles
   header: {
+    paddingTop: Platform.OS === 'ios' ? 50 : 40,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+  },
+  headerContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    justifyContent: 'space-between',
   },
   backButton: {
-    padding: 8,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitleContainer: {
+    flex: 1,
+    alignItems: 'center',
+    marginHorizontal: 20,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
-    color: '#2c3e50',
-    fontFamily: 'Poppins-SemiBold',
+    color: '#fff',
+    textAlign: 'center',
   },
+  headerSubtitle: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+    marginTop: 2,
+  },
+  headerIcon: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  
+  // Content Styles
   content: {
     flex: 1,
   },
   scrollContent: {
-    padding: 12, // Reduced from 16
-    paddingBottom: 24, // Reduced from 32
+    padding: 20,
+    paddingBottom: 40,
   },
-  section: {
-    backgroundColor: '#ffffff',
-    borderRadius: 10, // Reduced from 12
-    padding: 12, // Reduced from 16
-    marginBottom: 12, // Reduced from 16
+  
+  // Progress Card
+  progressCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    elevation: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 }, // Reduced shadow
-    shadowOpacity: 0.03, // Reduced shadow
-    shadowRadius: 6, // Reduced shadow
-    elevation: 2, // Reduced elevation
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  progressTitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#4a6fa5',
+    marginLeft: 8,
+  },
+  progressBar: {
+    height: 4,
+    backgroundColor: '#e9ecef',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#4a6fa5',
+    borderRadius: 2,
+  },
+  
+  // Section Styles
+  section: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 20,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12, // Reduced from 16
+    marginBottom: 20,
+  },
+  sectionIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  sectionTitleContainer: {
+    flex: 1,
   },
   sectionTitle: {
-    fontSize: 15, // Reduced from 16
+    fontSize: 18,
     fontWeight: '600',
     color: '#2c3e50',
-    marginLeft: 6, // Reduced from 8
-    fontFamily: 'Poppins-SemiBold',
   },
-  input: {
-    marginBottom: 8, // Reduced from 12
+  sectionSubtitle: {
+    fontSize: 12,
+    color: '#6c757d',
+    marginTop: 2,
   },
-  notesInput: {
-    marginBottom: 0,
+  
+  // Input Styles
+  inputsContainer: {
+    gap: 16,
   },
-  label: {
-    fontSize: 13, // Reduced from 14
+  inputContainer: {
+    marginBottom: 8,
+  },
+  inputLabel: {
+    fontSize: 16,
     fontWeight: '500',
-    color: '#4a6fa5',
-    marginBottom: 6, // Reduced from 8
-    fontFamily: 'Poppins-Medium',
+    color: '#2c3e50',
+    marginBottom: 8,
   },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    minHeight: 48,
+  },
+  inputError: {
+    borderColor: '#e74c3c',
+  },
+  inputIcon: {
+    paddingLeft: 12,
+    paddingRight: 8,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#2c3e50',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+  },
+  textInputMultiline: {
+    minHeight: 80,
+    textAlignVertical: 'top',
+    paddingTop: 12,
+  },
+  textInputWithIcon: {
+    paddingLeft: 0,
+  },
+  
+  // Label Styles
+  label: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#2c3e50',
+    marginBottom: 12,
+  },
+  
+  // Frequency Styles
   frequencyContainer: {
-    marginBottom: 12, // Reduced from 16
+    marginBottom: 24,
   },
   frequencyOptions: {
     flexDirection: 'row',
-    gap: 6, // Reduced from 8
+    gap: 12,
   },
   frequencyOption: {
     flex: 1,
-    paddingVertical: 10, // Reduced from 12
-    paddingHorizontal: 12, // Reduced from 16
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    borderRadius: 6, // Reduced from 8
-    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    overflow: 'hidden',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
-  frequencyOptionActive: {
-    backgroundColor: '#4a6fa5',
-    borderColor: '#4a6fa5',
+  frequencyGradient: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
   frequencyText: {
-    fontSize: 13, // Reduced from 14
+    fontSize: 14,
     fontFamily: 'Poppins-Medium',
     color: '#6c757d',
   },
   frequencyTextActive: {
-    color: '#ffffff',
+    color: '#fff',
   },
+  
+  // Days Selection Styles
   daysContainer: {
-    marginBottom: 12, // Reduced from 16
+    marginBottom: 24,
   },
   daysGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6, // Reduced from 8
+    gap: 8,
   },
   dayButton: {
-    width: (screenWidth - 80) / 7,
-    height: 36, // Reduced from 40
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    borderRadius: 6, // Reduced from 8
-    backgroundColor: '#f8f9fa',
+    width: (width - 80) / 4 - 6,
+    borderRadius: 10,
+    overflow: 'hidden',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
-  dayButtonActive: {
-    backgroundColor: '#4a6fa5',
-    borderColor: '#4a6fa5',
+  dayGradient: {
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   dayText: {
-    fontSize: 11, // Reduced from 12
+    fontSize: 12,
     fontFamily: 'Poppins-Medium',
     color: '#6c757d',
   },
   dayTextActive: {
-    color: '#ffffff',
+    color: '#fff',
   },
+  
+  // Duration Styles
   durationContainer: {
-    marginBottom: 12, // Reduced from 16
+    marginBottom: 24,
   },
   dateRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6, // Reduced from 8
+    gap: 12,
   },
   dateButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10, // Reduced from 12
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    padding: 16,
     borderWidth: 1,
     borderColor: '#e9ecef',
-    borderRadius: 6, // Reduced from 8
-    backgroundColor: '#f8f9fa',
-    minHeight: 36, // Added min height for consistency
+  },
+  dateContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  dateTextContainer: {
+    flex: 1,
+  },
+  dateLabel: {
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+    color: '#6c757d',
+    marginBottom: 2,
   },
   dateText: {
-    marginLeft: 6, // Reduced from 8
-    fontSize: 13, // Reduced from 14
-    color: '#495057',
-    fontFamily: 'Poppins-Regular',
-    flex: 1, // Added flex to prevent overflow
+    fontSize: 14,
+    fontFamily: 'Poppins-Medium',
+    color: '#2c3e50',
   },
-  toText: {
-    fontSize: 13, // Reduced from 14
-    color: '#6c757d',
-    fontFamily: 'Poppins-Regular',
+  arrowContainer: {
+    padding: 8,
   },
+  
+  // Time Styles
   timeContainer: {
-    marginBottom: 12, // Reduced from 16
+    marginBottom: 24,
   },
   timesHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6, // Reduced from 8
+    marginBottom: 12,
   },
   addTimeButton: {
-    padding: 4,
+    borderRadius: 20,
+    overflow: 'hidden',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  addTimeGradient: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  addTimeText: {
+    fontSize: 12,
+    fontFamily: 'Poppins-Medium',
+    color: '#fff',
   },
   timesGrid: {
-    gap: 6, // Reduced from 8
+    gap: 12,
   },
   timeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6, // Reduced from 8
-    marginBottom: 4, // Added margin for spacing
+    gap: 12,
   },
   timeButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10, // Reduced from 12
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    padding: 16,
     borderWidth: 1,
     borderColor: '#e9ecef',
-    borderRadius: 6, // Reduced from 8
-    backgroundColor: '#f8f9fa',
-    minHeight: 36, // Added min height for consistency
+  },
+  timeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   timeText: {
-    marginLeft: 6, // Reduced from 8
-    fontSize: 13, // Reduced from 14
-    color: '#495057',
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#2c3e50',
+    flex: 1,
+  },
+  timeFormat: {
+    fontSize: 12,
     fontFamily: 'Poppins-Regular',
+    color: '#6c757d',
   },
   removeTimeButton: {
-    padding: 4,
+    padding: 8,
   },
-  reminderToggle: {
+  
+  // Reminder Styles
+  reminderContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 8, // Added margin
+    backgroundColor: '#f8f9fa',
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
-  reminderLabel: {
+  reminderContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6, // Reduced from 8
+    flex: 1,
   },
-  errorText: {
-    color: '#e74c3c',
-    fontSize: 11, // Reduced from 12
-    marginTop: 3, // Reduced from 4
-    fontFamily: 'Poppins-Regular',
-  },
-  submitButton: {
-    borderRadius: 10, // Reduced from 12
-    overflow: 'hidden',
-    elevation: 3, // Reduced shadow
-    shadowColor: '#4a6fa5',
-    shadowOffset: { width: 0, height: 3 }, // Reduced shadow
-    shadowOpacity: 0.2, // Reduced shadow
-    shadowRadius: 6, // Reduced shadow
-    marginTop: 8, // Added margin
-  },
-  submitGradient: {
-    flexDirection: 'row',
-    paddingVertical: 14, // Reduced from 16
+  reminderIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(74, 111, 165, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6, // Reduced from 8
+    marginRight: 16,
+  },
+  reminderTextContainer: {
+    flex: 1,
+  },
+  reminderTitle: {
+    fontSize: 16,
+    fontFamily: 'Poppins-Medium',
+    color: '#2c3e50',
+  },
+  reminderDescription: {
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+    color: '#6c757d',
+    marginTop: 2,
+  },
+  
+  // Submit Button Styles
+  submitContainer: {
+    marginTop: 10,
+  },
+  submitButton: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+  },
+  submitButtonDisabled: {
+    opacity: 0.7,
+  },
+  submitGradient: {
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  submitContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   submitText: {
-    color: '#ffffff',
-    fontSize: 15, // Reduced from 16
-    fontWeight: '600',
+    fontSize: 16,
     fontFamily: 'Poppins-SemiBold',
+    color: '#fff',
+  },
+  
+  // Error Text
+  errorText: {
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+    color: '#e74c3c',
+    marginTop: 4,
   },
 });

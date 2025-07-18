@@ -18,6 +18,10 @@ class User:
         
         user_data['created_at'] = datetime.utcnow()
         user_data['updated_at'] = datetime.utcnow()
+        # Add face-related fields
+        user_data['face_id'] = None
+        user_data['face_registered'] = False
+        user_data['face_samples_count'] = 0
         
         result = cls.get_collection().insert_one(user_data)
         return result.inserted_id
@@ -36,6 +40,20 @@ class User:
     def update_user(cls, user_id, update_data):
         """Update user information"""
         update_data['updated_at'] = datetime.utcnow()
+        return cls.get_collection().update_one(
+            {'_id': ObjectId(user_id)},
+            {'$set': update_data}
+        )
+    
+    @classmethod
+    def update_face_data(cls, user_id, face_id, samples_count):
+        """Update user's face registration data"""
+        update_data = {
+            'face_id': face_id,
+            'face_registered': True,
+            'face_samples_count': samples_count,
+            'updated_at': datetime.utcnow()
+        }
         return cls.get_collection().update_one(
             {'_id': ObjectId(user_id)},
             {'$set': update_data}
