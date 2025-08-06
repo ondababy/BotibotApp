@@ -6,7 +6,7 @@ def validate_registration_data(data):
     errors = {}
     
     # Required fields - only essential ones
-    required_fields = ['email', 'password']
+    required_fields = ['email', 'pinCode']
     
     for field in required_fields:
         if field not in data or not data[field]:
@@ -33,10 +33,10 @@ def validate_registration_data(data):
         if '@' not in data['email'] or '.' not in data['email']:
             errors['email'] = "Invalid email format"
     
-    # Password strength validation - more lenient
-    if 'password' in data and data['password']:
-        if len(data['password']) < 3:
-            errors['password'] = "Password must be at least 3 characters long"
+    # PIN code validation
+    if 'pinCode' in data and data['pinCode']:
+        if not re.match(r'^[0-9]{4,6}$', data['pinCode']):
+            errors['pinCode'] = "PIN code must be 4-6 digits only"
     
     # Age validation - more lenient
     if 'age' in data and data['age']:
@@ -68,12 +68,17 @@ def validate_login_data(data):
     if 'email' not in data or not data['email']:
         errors['email'] = "Email is required"
     
-    if 'password' not in data or not data['password']:
-        errors['password'] = "Password is required"
+    if 'pinCode' not in data or not data['pinCode']:
+        errors['pinCode'] = "PIN code is required"
     
     # Email format validation - more lenient
     if 'email' in data and data['email']:
         if '@' not in data['email'] or '.' not in data['email']:
             errors['email'] = "Invalid email format"
+    
+    # PIN code validation
+    if 'pinCode' in data and data['pinCode']:
+        if not re.match(r'^[0-9]{4,6}$', data['pinCode']):
+            errors['pinCode'] = "PIN code must be 4-6 digits only"
     
     return errors

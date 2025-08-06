@@ -71,7 +71,7 @@ def register():
         'age': int(data['age']),
         'address': data['address'],
         'email': data['email'],
-        'password': data['password'],
+        'pinCode': data['pinCode'],
         'contactNumber': data['contactNumber'],
         'emergencyContactName': data['emergencyContactName'],
         'emergencyContactNumber': data['emergencyContactNumber']
@@ -109,11 +109,14 @@ def login():
     # Find user by email
     user = User.find_by_email(data['email'])
     if not user:
-        return jsonify({'message': 'Invalid email or password'}), 401
+        return jsonify({'message': 'Invalid email or PIN code'}), 401
     
-    # Verify password
-    if not User.verify_password(user['password'], data['password']):
-        return jsonify({'message': 'Invalid email or password'}), 401
+    # Verify PIN code
+    if 'pinCode' not in user:
+        return jsonify({'message': 'User account needs to be updated. Please contact support.'}), 401
+        
+    if not User.verify_pin_code(user['pinCode'], data['pinCode']):
+        return jsonify({'message': 'Invalid email or PIN code'}), 401
     
     # Generate authentication token
     token = generate_token(user['_id'])

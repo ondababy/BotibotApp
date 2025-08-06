@@ -32,9 +32,9 @@ const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * fact
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    pinCode: ''
   })
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPinCode, setShowPinCode] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState({})
@@ -85,7 +85,12 @@ const Login = () => {
     // Validate form
     const newErrors = {}
     if (!formData.email) newErrors.email = 'Email is required'
-    if (!formData.password) newErrors.password = 'Password is required'
+    if (!formData.pinCode) newErrors.pinCode = 'PIN code is required'
+    
+    // PIN code validation
+    if (formData.pinCode && !/^[0-9]{4,6}$/.test(formData.pinCode)) {
+      newErrors.pinCode = 'PIN must be 4-6 digits only'
+    }
     
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -98,7 +103,7 @@ const Login = () => {
       // Make API request to login
       const response = await axios.post(`${baseURL}/auth/login`, {
         email: formData.email,
-        password: formData.password
+        pinCode: formData.pinCode
       })
       
       // Store auth token
@@ -234,7 +239,7 @@ const Login = () => {
                 )}
               </Animatable.View>
 
-              {/* Password Input */}
+              {/* PIN Code Input */}
               <Animatable.View 
                 animation="fadeInLeft" 
                 delay={500}
@@ -245,27 +250,28 @@ const Login = () => {
                     <Ionicons name="lock-closed-outline" size={moderateScale(18)} color="#4a6fa5" />
                   </View>
                   <TextInput
-                    style={[styles.input, errors.password && styles.inputError]}
-                    placeholder="Password"
+                    style={[styles.input, errors.pinCode && styles.inputError]}
+                    placeholder="PIN Code (4-6 digits)"
                     placeholderTextColor="#a0aec0"
-                    value={formData.password}
-                    onChangeText={(value) => handleInputChange('password', value)}
-                    secureTextEntry={!showPassword}
+                    value={formData.pinCode}
+                    onChangeText={(value) => handleInputChange('pinCode', value.replace(/[^0-9]/g, '').slice(0, 6))}
+                    keyboardType="numeric"
+                    secureTextEntry={!showPinCode}
                   />
                   <TouchableOpacity 
                     style={styles.eyeIcon}
-                    onPress={() => setShowPassword(!showPassword)}
+                    onPress={() => setShowPinCode(!showPinCode)}
                   >
                     <Ionicons 
-                      name={showPassword ? "eye-outline" : "eye-off-outline"} 
+                      name={showPinCode ? "eye-outline" : "eye-off-outline"} 
                       size={moderateScale(18)} 
                       color="#4a6fa5" 
                     />
                   </TouchableOpacity>
                 </View>
-                {errors.password && (
+                {errors.pinCode && (
                   <Animatable.Text animation="shake" style={styles.errorText}>
-                    {errors.password}
+                    {errors.pinCode}
                   </Animatable.Text>
                 )}
               </Animatable.View>

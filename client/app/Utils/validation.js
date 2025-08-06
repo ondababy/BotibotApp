@@ -4,7 +4,7 @@ export const validateForm = (formData) => {
 
   // Required field validation - only for essential fields
   if (!formData.email?.trim()) errors.email = 'Email is required'
-  if (!formData.password?.trim()) errors.password = 'Password is required'
+  if (!formData.pinCode?.trim()) errors.pinCode = 'PIN code is required'
 
   // Optional fields - only validate if provided
   if (formData.firstName && !formData.firstName.trim()) errors.firstName = 'First name cannot be empty'
@@ -16,17 +16,20 @@ export const validateForm = (formData) => {
     errors.email = 'Please enter a valid email address'
   }
 
-  // Password validation - more lenient
-  if (formData.password && formData.password.length < 3) {
-    errors.password = 'Password must be at least 3 characters'
+  // PIN code validation
+  if (formData.pinCode) {
+    const pinRegex = /^[0-9]{4,6}$/
+    if (!pinRegex.test(formData.pinCode)) {
+      errors.pinCode = 'PIN must be 4-6 digits only'
+    }
   }
   
-  // Confirm password validation - only if confirmPassword field exists
-  if (formData.confirmPassword !== undefined) {
-    if (!formData.confirmPassword?.trim()) {
-      errors.confirmPassword = 'Please confirm your password'
-    } else if (formData.confirmPassword !== formData.password) {
-      errors.confirmPassword = 'Passwords do not match'
+  // Confirm PIN code validation - only if confirmPinCode field exists
+  if (formData.confirmPinCode !== undefined) {
+    if (!formData.confirmPinCode?.trim()) {
+      errors.confirmPinCode = 'Please confirm your PIN code'
+    } else if (formData.confirmPinCode !== formData.pinCode) {
+      errors.confirmPinCode = 'PIN codes do not match'
     }
   }
 

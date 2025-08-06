@@ -109,8 +109,8 @@ export default function Register() {
     age: "",
     address: "",
     email: "",
-    password: "",
-    confirmPassword: "",
+    pinCode: "",
+    confirmPinCode: "",
     contactNumber: "",
     emergencyContactName: "",
     emergencyContactNumber: "",
@@ -119,7 +119,7 @@ export default function Register() {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [currentSection, setCurrentSection] = useState(0);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPinCode, setShowPinCode] = useState(false);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -218,7 +218,8 @@ export default function Register() {
         setCurrentSection(0);
       } else if (
         firstErrorSection.includes("email") ||
-        firstErrorSection.includes("contact")
+        firstErrorSection.includes("contact") ||
+        firstErrorSection.includes("pinCode")
       ) {
         setCurrentSection(1);
       } else {
@@ -464,13 +465,14 @@ export default function Register() {
                     />
 
                     <InputField
-                      label="Password *"
-                      value={formData.password}
+                      label="PIN Code (4-6 digits) *"
+                      value={formData.pinCode}
                       onChangeText={(value) =>
-                        handleInputChange("password", value)
+                        handleInputChange("pinCode", value.replace(/[^0-9]/g, '').slice(0, 6))
                       }
-                      placeholder="Create a secure password"
-                      error={errors.password}
+                      placeholder="Create a 4-6 digit PIN"
+                      keyboardType="numeric"
+                      error={errors.pinCode}
                       icon={
                         <Ionicons
                           name="lock-closed-outline"
@@ -478,16 +480,16 @@ export default function Register() {
                           color="#4a6fa5"
                         />
                       }
-                      secureTextEntry={!showPassword}
+                      secureTextEntry={!showPinCode}
                       delay={300}
                       rightIcon={
                         <TouchableOpacity
-                          onPress={() => setShowPassword(!showPassword)}
+                          onPress={() => setShowPinCode(!showPinCode)}
                           style={styles.eyeIcon}
                         >
                           <Ionicons
                             name={
-                              showPassword ? "eye-outline" : "eye-off-outline"
+                              showPinCode ? "eye-outline" : "eye-off-outline"
                             }
                             size={moderateScale(18)}
                             color="#4a6fa5"
@@ -497,13 +499,14 @@ export default function Register() {
                     />
 
                     <InputField
-                      label="Confirm Password *"
-                      value={formData.confirmPassword}
+                      label="Confirm PIN Code *"
+                      value={formData.confirmPinCode}
                       onChangeText={(value) =>
-                        handleInputChange("confirmPassword", value)
+                        handleInputChange("confirmPinCode", value.replace(/[^0-9]/g, '').slice(0, 6))
                       }
-                      placeholder="Confirm your password"
-                      error={errors.confirmPassword}
+                      placeholder="Confirm your PIN"
+                      keyboardType="numeric"
+                      error={errors.confirmPinCode}
                       icon={
                         <Ionicons
                           name="shield-checkmark-outline"
@@ -511,16 +514,16 @@ export default function Register() {
                           color="#4a6fa5"
                         />
                       }
-                      secureTextEntry={!showPassword}
+                      secureTextEntry={!showPinCode}
                       delay={400}
                       rightIcon={
                         <TouchableOpacity
-                          onPress={() => setShowPassword(!showPassword)}
+                          onPress={() => setShowPinCode(!showPinCode)}
                           style={styles.eyeIcon}
                         >
                           <Ionicons
                             name={
-                              showPassword ? "eye-outline" : "eye-off-outline"
+                              showPinCode ? "eye-outline" : "eye-off-outline"
                             }
                             size={moderateScale(18)}
                             color="#4a6fa5"
@@ -870,6 +873,9 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   checkIcon: {
+    paddingRight: moderateScale(10),
+  },
+  eyeIcon: {
     paddingRight: moderateScale(10),
   },
   errorContainer: {

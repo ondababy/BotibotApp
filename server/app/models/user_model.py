@@ -12,9 +12,9 @@ class User:
     @classmethod
     def create_user(cls, user_data):
         """Create a new user in the database"""
-        # Hash the password before storing
-        if 'password' in user_data:
-            user_data['password'] = generate_password_hash(user_data['password'])
+        # Hash the PIN code before storing
+        if 'pinCode' in user_data:
+            user_data['pinCode'] = generate_password_hash(user_data['pinCode'])
         
         user_data['created_at'] = datetime.utcnow()
         user_data['updated_at'] = datetime.utcnow()
@@ -60,6 +60,11 @@ class User:
         )
     
     @classmethod
+    def verify_pin_code(cls, stored_pin, provided_pin):
+        """Verify the provided PIN code against the stored hash"""
+        return check_password_hash(stored_pin, provided_pin)
+    
+    @classmethod
     def verify_password(cls, stored_password, provided_password):
-        """Verify the provided password against the stored hash"""
+        """Verify the provided password against the stored hash (for backward compatibility)"""
         return check_password_hash(stored_password, provided_password)
